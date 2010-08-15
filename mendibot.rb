@@ -1,9 +1,11 @@
 require 'rubygems'
 require 'isaac'
 require "#{File.dirname(__FILE__)}/bot_config"
-require 'rest-client'
+require 'rest_client'
 require 'json'
 require 'date'
+require 'cgi'
+require 'yelp_query'
 
 $topics = {}
 
@@ -35,4 +37,19 @@ on :channel do
   }.to_json
   
   service["/chat/messages.json"].post(:message => msg)
+end
+
+#############################################################################
+# YelpBot
+############################################################################
+
+on :channel, /^!yelp (.*)/ do
+  
+  unless match[0] == "-h" or match[0] == "help"
+    @yelp_query = YelpBot::Query.new match[0]
+    @yelp_results = @yelp_query.get
+    msg channel, "#{nick}: #{@yelp_results.to_irc}" 
+  else
+    msg channel, YelpBot::YelpHelp
+  end
 end

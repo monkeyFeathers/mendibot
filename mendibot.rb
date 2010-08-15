@@ -5,7 +5,7 @@ require 'rest_client'
 require 'json'
 require 'date'
 require 'cgi'
-require 'yelp_query'
+require 'yelpbot'
 
 $topics = {}
 
@@ -44,12 +44,15 @@ end
 ############################################################################
 
 on :channel, /^!yelp (.*)/ do
-  
-  unless match[0] == "-h" or match[0] == "help"
+  if match[0] == "-h" or match[0] == "help"
+    msg channel, YelpBot::YelpHelp
+  # elsif match[0].match /^(crack )/i
+  #   msg channel, YelpBot::YelpCrackClarify
+  # elsif match[0].match /^crack+cocaine/i
+  #   msg channel, "hello world"
+  else
     @yelp_query = YelpBot::Query.new match[0]
     @yelp_results = @yelp_query.get
-    msg channel, "#{nick}: #{@yelp_results.to_irc}" 
-  else
-    msg channel, YelpBot::YelpHelp
+    msg channel, "#{nick}: #{@yelp_results.to_irc}"
   end
 end

@@ -1,7 +1,9 @@
 module YelpBot
   
   YelpHelp = "usage: !yelp [search term (e.g. 'bars' for multiple words use '+' instead of ' ')] [location (e.g. 'Portland, OR')]"
-
+  YelpCrack = "Ah, man...why you want to waste your life on that stuff?"
+  YelpCrackClarify = "did you mean 'crack+cocaine'?"
+  
   class Query
     attr_accessor :term, :location, :category, :query
   
@@ -10,13 +12,13 @@ module YelpBot
     ####################################################################################################
     # yelp api key goes here, they made me promise not to share mine :(
     #
-    YWSID = "" 
+    YWSID = "5gerYyIQDNNAMWN10ahp4g" 
     #
     #
     ######################################################################################################
   
     def initialize(match_data)
-    
+      process_match_data match_data
     end
   
     def process_match_data match_data
@@ -45,7 +47,7 @@ module YelpBot
     
       # send get request via restclient and capture results in instance variable
       resource = RestClient::Resource.new(@query)
-      results = YelpBot::Result.new JSON.parse(resource.get)
+      results = YelpBot::Results.new JSON.parse(resource.get)
     end
   
   end
@@ -85,15 +87,7 @@ module YelpBot
     def handle_response_codes
       @output = case @message["code"]
       when 0
-        if @term.match /^crack/
-          unless @term == "crack+cocaine"
-            @output = "did you mean 'crack+cocaine'?"
-          else
-            @output = "why you want to waste your life on that stuff?"
-          end
-        else
-          process_output
-        end
+        process_output
       else
         "Could not complete request: #{@message["text"]}"
       end
